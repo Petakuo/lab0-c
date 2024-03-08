@@ -18,12 +18,23 @@ struct list_head *q_new()
         (struct list_head *) malloc(sizeof(struct list_head));
     if (head != NULL) {
         INIT_LIST_HEAD(head);
+        return head;
     }
-    return head;
+    return NULL;
 }
 
 /* Free all storage used by queue */
-void q_free(struct list_head *head) {}
+void q_free(struct list_head *head)
+{
+
+    if (head == NULL)
+        return;
+    element_t *entry, *safe;
+    list_for_each_entry_safe (entry, safe, head, list) {
+        q_release_element(entry);
+    }
+    free(head);
+}
 
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
@@ -85,7 +96,34 @@ void q_reverseK(struct list_head *head, int k)
 }
 
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+void q_sort(struct list_head *head, bool descend)
+{
+    struct list_head list_less, list_greater;
+    struct listitem *pivot;
+    struct listitem *item = NULL, *is = NULL;
+
+    if (list_empty(head) || list_is_singular(head))
+        return;
+
+    INIT_LIST_HEAD(&list_less);
+    INIT_LIST_HEAD(&list_greater);
+
+    pivot = list_first_entry(head, struct listitem, list);
+    list_del(&pivot->list);
+
+    list_for_each_entry_safe (item, is, head, list) {
+        if (cmpint(&item->i, &pivot->i) < 0)
+            list_move_tail(&item->list, &list_less);
+        else
+            list_move_tail(&item->list, &list_greater);
+    }
+
+    list_qsort(&list_less);
+    list_qsort(&list_greater);
+    list_splice(&list_less, &pivot);
+    list_splice_tail(&list_greater, &pivot);
+
+}
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
