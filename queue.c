@@ -39,12 +39,22 @@ void q_free(struct list_head *head)
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (head == NULL && s == NULL)
+        return false;
+    element_t *node = malloc(sizeof(element_t));
+    node->value = strdup(s);
+    list_add(&node->list, head);
     return true;
 }
 
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    if (head == NULL && s == NULL)
+        return false;
+    element_t *node = malloc(sizeof(element_t));
+    node->value = strdup(s);
+    list_add_tail(&node->list, head);
     return true;
 }
 
@@ -97,6 +107,7 @@ void q_reverseK(struct list_head *head, int k)
 
 /* Sort elements of queue in ascending/descending order */
 void q_sort(struct list_head *head, bool descend) {}
+
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
