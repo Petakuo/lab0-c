@@ -39,10 +39,16 @@ void q_free(struct list_head *head)
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
-    if (head == NULL || s == NULL)
+    if (!head)
         return false;
-    element_t *node = malloc(sizeof(element_t));
+    element_t *node = (element_t *) malloc(sizeof(element_t));
+    if (!node)
+        return false;
     node->value = strdup(s);
+    if (!node->value) {
+        free(node);
+        return false;
+    }
     list_add(&node->list, head);
     return true;
 }
@@ -50,10 +56,16 @@ bool q_insert_head(struct list_head *head, char *s)
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
-    if (head == NULL || s == NULL)
+    if (!head)
         return false;
-    element_t *node = malloc(sizeof(element_t));
+    element_t *node = (element_t *) malloc(sizeof(element_t));
+    if (!node)
+        return false;
     node->value = strdup(s);
+    if (!node->value) {
+        free(node);
+        return false;
+    }
     list_add_tail(&node->list, head);
     return true;
 }
@@ -106,6 +118,16 @@ int q_size(struct list_head *head)
 /* Delete the middle node in queue */
 bool q_delete_mid(struct list_head *head)
 {
+    if (head == NULL || head->next == head)
+        return false;
+    int half = q_size(head) / 2;
+    struct list_head *ptr = head->next;
+    for (int i = 0; i < half; i++) {
+        ptr = ptr->next;
+    }
+    element_t *dnode = list_entry(ptr, element_t, list);
+    q_release_element(dnode);
+    list_del(ptr);
     // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
     return true;
 }
