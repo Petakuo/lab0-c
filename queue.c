@@ -26,7 +26,6 @@ struct list_head *q_new()
 /* Free all storage used by queue */
 void q_free(struct list_head *head)
 {
-
     if (head == NULL)
         return;
     element_t *entry, *safe;
@@ -39,13 +38,13 @@ void q_free(struct list_head *head)
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
-    if (!head)
+    if (head == NULL || s == NULL)
         return false;
     element_t *node = (element_t *) malloc(sizeof(element_t));
-    if (!node)
+    if (node == NULL)
         return false;
     node->value = strdup(s);
-    if (!node->value) {
+    if (node->value == NULL) {
         free(node);
         return false;
     }
@@ -56,13 +55,13 @@ bool q_insert_head(struct list_head *head, char *s)
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
-    if (!head)
+    if (head == NULL || s == NULL)
         return false;
     element_t *node = (element_t *) malloc(sizeof(element_t));
-    if (!node)
+    if (node == NULL)
         return false;
     node->value = strdup(s);
-    if (!node->value) {
+    if (node->value == NULL) {
         free(node);
         return false;
     }
@@ -126,8 +125,8 @@ bool q_delete_mid(struct list_head *head)
         ptr = ptr->next;
     }
     element_t *dnode = list_entry(ptr, element_t, list);
-    q_release_element(dnode);
     list_del(ptr);
+    q_release_element(dnode);
     // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
     return true;
 }
@@ -142,11 +141,29 @@ bool q_delete_dup(struct list_head *head)
 /* Swap every two adjacent nodes */
 void q_swap(struct list_head *head)
 {
+    if (head == NULL || head->next == head)
+        return;
+    struct list_head *node = head->next;
+    while (node != head && node->next != head) {
+        list_move(node, node->prev);
+        node = node->next;
+    }
     // https://leetcode.com/problems/swap-nodes-in-pairs/
 }
 
 /* Reverse elements in queue */
-void q_reverse(struct list_head *head) {}
+void q_reverse(struct list_head *head)
+{
+    if (head == NULL || head->next == head)
+        return;
+    struct list_head *node = head->next;
+    struct list_head *next = node->next;
+    while (next != head) {
+        next = node->next;
+        list_move(node, head);
+        node = next;
+    }
+}
 
 /* Reverse the nodes of the list k at a time */
 void q_reverseK(struct list_head *head, int k)
