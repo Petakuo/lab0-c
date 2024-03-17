@@ -173,7 +173,7 @@ void q_reverseK(struct list_head *head, int k)
     struct list_head *new_head = head;
     struct list_head *node = head->next;
     struct list_head *next = node->next;
-    int c = 0;
+    int c = 1;
     while (next != head) {
         while (c <= k && next != head) {
             next = node->next;
@@ -182,7 +182,7 @@ void q_reverseK(struct list_head *head, int k)
             c++;
         }
         new_head = next->prev;
-        c = 0;
+        c = 1;
     }
     // https://leetcode.com/problems/reverse-nodes-in-k-group/
 }
