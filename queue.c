@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -187,8 +188,49 @@ void q_reverseK(struct list_head *head, int k)
     // https://leetcode.com/problems/reverse-nodes-in-k-group/
 }
 
+struct listitem {
+    uint16_t i;
+    struct list_head list;
+};
+
+static inline int cmpint(const void *p1, const void *p2)
+{
+    const uint16_t *i1 = (const uint16_t *) p1;
+    const uint16_t *i2 = (const uint16_t *) p2;
+
+    return *i1 - *i2;
+}
+
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+void q_sort(struct list_head *head, bool descend)
+{
+    struct list_head list_less, list_greater;
+    struct listitem *pivot;
+    struct listitem *item = NULL, *is = NULL;
+
+    if (list_empty(head) || list_is_singular(head))
+        return;
+
+    INIT_LIST_HEAD(&list_less);
+    INIT_LIST_HEAD(&list_greater);
+
+    pivot = list_first_entry(head, struct listitem, list);
+    list_del(&pivot->list);
+
+    list_for_each_entry_safe (item, is, head, list) {
+        if (cmpint(&item->i, &pivot->i) < 0)
+            list_move_tail(&item->list, &list_less);
+        else
+            list_move_tail(&item->list, &list_greater);
+    }
+
+    q_sort(&list_less, descend);
+    q_sort(&list_greater, descend);
+
+    list_splice_tail_init(&list_less, head);
+    list_add_tail(&pivot->list, head);
+    list_splice_tail(&list_greater, head);
+}
 
 
 
